@@ -15,7 +15,8 @@ class Resource {
 
   @POST
   def make(dto: TodoDto): Todo = {
-    val newId = Database.todos.keys.fold(1)({ case (a, b) => if (a > b) a else b })
+    val maxCurrentId = Database.todos.keys.fold(1)({ case (a, b) => if (a > b) a else b })
+    val newId = maxCurrentId + 1
     val todo = Todo.fromDto(dto, newId)
 
 
