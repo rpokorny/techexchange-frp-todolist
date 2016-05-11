@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Demonstration app of an FRP architecture using Immutable.js, Kefir.js, and React.js",
   "main": "index.js",
+  "repository": "https://github.com/rpokorny/techexchange-frp-todolist.git",
   "scripts": {
     "start": "gulp webpack-dev",
     "clean": "gulp clean"
@@ -36,7 +37,6 @@
     "fs": "0.0.2",
     "fs-extra": "^0.30.0",
     "gulp": "^3.9.1",
-    "gulp-rename": "^1.2.2",
     "gulp-util": "^3.0.7",
     "webpack": "^1.13.0",
     "webpack-dev-server": "^1.14.1"

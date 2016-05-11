@@ -1,11 +1,6 @@
 import React from 'react';
 import classnames from 'classnames';
 
-//example of using a third-party component.  Be aware that
-//not all third-party react components were designed with stateless
-//UI principles in mind, and some will not work with this architecture
-import Toggle from 'react-toggle';
-
 import ActionPool from '../frp/ActionPool';
 import AsyncActionPool from '../frp/AsyncActionPool';
 import { SetEditName, CancelEdit, StartEdit } from '../Action';
@@ -67,8 +62,8 @@ export default function TodoCmp({todo, idBeingEdited, editName}) {
     return (
         <li className={className}>
             <div className="view">
-                <Toggle className="completed-toggle" onChange={toggleCompleted.bind(null, id)}
-                    checked={completed} />
+                <input type="checkbox" className="toggle" checked={completed}
+                    onChange={toggleCompleted.bind(null, id)} />
 
                 <label onDoubleClick={startEdit.bind(null, id)}>{name}</label>
 
