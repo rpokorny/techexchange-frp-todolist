@@ -62,6 +62,7 @@ export function AddTodo(todo) {
         else {
             //the list of todos with the new todo appended
             const newTodos = existingTodos.push(todoModel);
+
             return noError(model.set('todos', newTodos));
         }
     };
@@ -87,19 +88,20 @@ export function DeleteTodo(id) {
 
 /**
  * Update the Todo with the given id
+ * @param todo A POJO representing the Todo
  */
 export function UpdateTodoById(id, todo) {
-    const deleteAction = DeleteTodo(id),
-        addAction = AddTodo(todo);
+    const todoModel = Todo(todo);
 
-    //compose AddTodo and DeleteTodo to perform an update, but take care not to ignore delete
-    //errors
     return function(model) {
-        const deleteResult = deleteAction(model);
+        const index = model.todos.findIndex(t => t.id === id);
 
-        return deleteResult.errorMessage ?
-            deleteResult :
-            addAction(deleteResult);
+        if (index !== -1) {
+            return noError(model.update('todos', todos => todos.set(index, todoModel)));
+        }
+        else {
+            return SetErrorMessage(`Id ${id} not found`);
+        }
     };
 }
 
