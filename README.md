@@ -9,4 +9,5 @@ To start the backend, go into the `backend` directory and run `mvn jetty:run`.
 mvn must be installed on your system.
 
 To start the frontend, go into the `frontend` directory and run `npm start`.
-npm and node must be installed on your system
+npm and node must be installed on your system.  Before running the frontend, you
+must run `npm install` in order to download dependencies.
