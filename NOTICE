@@ -1,5 +1,7 @@
 #############################################################################
-# Licensing for style.css:
+style.css was primarily taken from the Elm language's todomvc example, located
+at https://github.com/evancz/elm-todomvc .  It has been modified slightly for this
+FRP demo.  Its original license is reproduced below:
 
 Copyright (c) 2014, Evan Czaplicki
 All rights reserved.
