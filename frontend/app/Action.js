@@ -16,8 +16,11 @@ export function Loading() {
     return model => noError(model.set('loading', true));
 }
 
-//this function sets the error message based on the message parameter
-export function SetErrorMessage(message) {
+//this function sets the error message based on the parameter.
+//`error` can either be a string or an Error object.
+export function SetErrorMessage(error) {
+    const message = error instanceof Error ? error.message : error;
+
     return model => model.merge({
         loading: false,
         errorMessage: message
@@ -72,8 +75,8 @@ export function DeleteTodo(id) {
         //split the todos into two lists - ones that match the id and ones that don't
         const groups = model.todos.groupBy(t => t.id === id ? 'del' : 'keep');
 
-        if (groups.del.size) {
-            return noError(model.set('todos', groups.keep));
+        if (groups.get('del')) {
+            return noError(model.set('todos', groups.get('keep') || Immutable.List()));
         }
         else {
             //couldn't find anything to delete
@@ -101,17 +104,10 @@ export function UpdateTodoById(id, todo) {
 }
 
 /**
- * Set the completed flag on the model that represents the Todo currently being added
- */
-export function SetAddingCompleted(completed) {
-    return model => model.setIn(['addingTodo', 'completed'], completed);
-}
-
-/**
  * Set the name on the model that represents the Todo currently being added
  */
 export function SetAddingName(name) {
-    return model => model.setIn(['addingTodo', 'name'], name);
+    return model => model.set('addingName', name);
 }
 
 /**
@@ -164,10 +160,9 @@ export function DismissError() {
 }
 
 /**
- * Reset the addingTodo
+ * Reset the addingName.  When you delete a property on an immutable record, it
+ * actually gets set back to the default
  */
-export function ClearAddingTodo() {
-    //when a field is deleted from an Immutable.Record, it isn't actually deleted
-    //but rather set back to its default
-    return model => model.addingTodo.delete('addingTodo');
+export function ClearAddingName() {
+    return model => model.delete('addingName');
 }

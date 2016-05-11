@@ -5,11 +5,10 @@ import Model from '../model/Model';
 
 //import the UI component for individual Todo items
 import Todo from './Todo';
-import Toggle from 'react-toggle';
 
 import ActionPool from '../frp/ActionPool';
 import AsyncActionPool from '../frp/AsyncActionPool';
-import { DismissError, SetAddingName, SetAddingCompleted } from '../Action';
+import { DismissError, SetAddingName } from '../Action';
 import { AddTodo } from '../AsyncAction';
 
 //handler for the error message close button - like all handlers in this architecture, it
@@ -22,12 +21,11 @@ function updateAddingName(evt) {
     ActionPool.sendAction(SetAddingName(evt.target.value));
 }
 
-function updateAddingCompleted(evt) {
-    ActionPool.sendAction(SetAddingCompleted(evt.target.checked));
-}
-
-function saveNewTodo() {
-    AsyncActionPool.sendAction(AddTodo());
+function handleAddNewKeydown(evt) {
+    //detect ENTER and save the todo when it is pressed
+    if (evt.keyCode === 13) {
+        AsyncActionPool.sendAction(AddTodo());
+    }
 }
 
 /**
@@ -39,55 +37,57 @@ function saveNewTodo() {
  * Note that the component's props objects is destructured in the parameter list
  */
 export default function App({model}) {
-    const {loading, todos, errorMessage, addingTodo} = model,
+    const {loading, todos, errorMessage, addingName, editName, editing} = model,
+
+        //function to create a <Todo> component for a Todo model.  Whenever creating a list
+        //of components, the `key` prop is required so react can efficiently keep track of
+        //which is which in case of reordering or deletion
+        mkTodo = todo =>
+            <Todo key={todo.id} todo={todo} idBeingEdited={editing} editName={editName} />,
 
         //use the classnames utility to easily create a string value for the html class attr.
-        //In this case we want the <main> element to have a 'loading' class iff the loading
-        //property is true.
-        //Note that in jsx, you use className instead of class, since class is a reserved
-        //word in javascript
+        //In this case we want the <main> element to have a 'loading'
+        //class iff the loading property is true.
         mainClasses = classnames({ loading }),
 
-        //create a list of <li> elements from the todos.  One of the great things about
+        //create a list of <Todo> components from the todos.  One of the great things about
         //react is that this type of logic is done in plain old js instead of some half-baked
         //template language
         todoEls = todos
             .toSeq()                                //create lazy seq to avoid intermediate
                                                     //collections
 
-            .map(t => <Todo key={t.id} todo={t}/>)  //create a <Todo> component for each element.
-                                                    //Whenever creating a list of components,
-                                                    //the `key` prop is required so react can
-                                                    //efficiently keep track of which is which
-                                                    //in case of reordering or deletion
+            .map(mkTodo)                            //create a <Todo> for each Todo
 
             .toArray();                             //convert the seq to an array since react
                                                     //cannot directly handle Immutable.js
                                                     //collections
 
+    //Note that in jsx, you use className instead of class, since class is a reserved
+    //word in javascript
     return (
-        <main className={mainClasses}>
-            <h1>FRP Todo List</h1>
+        <section id="todoapp" className={mainClasses}>
+            <header id="header">
+                <h1>FRP Todo List</h1>
+                <input type="text" id="new-todo" placeholder="What needs to be done?"
+                    autofocus value={addingName}
+                    onChange={updateAddingName} onKeyDown={handleAddNewKeydown} />
+            </header>
             <div className="loading-spinner"/>
+            <section id="main">
+                { /* Only include this next <section> if there is an errorMessage */ }
+                { errorMessage &&
+                    <section className="error-message">
+                        {errorMessage}
+                        <button className="close" onClick={dismissError}></button>
+                    </section>
+                }
 
-            { /* Only include this next <section> if there is an errorMessage */ }
-            { errorMessage &&
-                <section className="error-message">
-                    {errorMessage}
-                    <button className="close" onClick={dismissError}>&times;</button>
-                </section>
-            }
-
-            <ul>
-                {todoEls}
-                <li className="add-new">
-                    <input type="text" value={addingTodo.name} onChange={updateAddingName} />
-                    <Toggle className="completed-toggle" onChange={updateAddingCompleted}
-                        checked={addingTodo.completed} />
-                    <button className="save" onClick={saveNewTodo}>Save</button>
-                </li>
-            </ul>
-        </main>
+                <ul id="todo-list">
+                    {todoEls}
+                </ul>
+            </section>
+        </section>
     );
 }
 

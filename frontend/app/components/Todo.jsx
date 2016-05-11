@@ -1,17 +1,19 @@
 import React from 'react';
+import classnames from 'classnames';
 
 //example of using a third-party component.  Be aware that
 //not all third-party react components were designed with stateless
 //UI principles in mind, and some will not work with this architecture
 import Toggle from 'react-toggle';
 
-import { sendAction } from '../frp/ActionPool';
+import ActionPool from '../frp/ActionPool';
 import AsyncActionPool from '../frp/AsyncActionPool';
 import { SetEditName, CancelEdit, StartEdit } from '../Action';
 import { SetTodoCompleted, ConcludeEdit, DeleteTodo } from '../AsyncAction';
 
 import Todo from '../model/Todo';
 
+const { sendAction } = ActionPool;
 const sendAsyncAction = AsyncActionPool.sendAction;
 
 /**
@@ -22,7 +24,7 @@ function updateEditName(evt) {
     sendAction(SetEditName(evt.target.value));
 }
 
-function editorKeyPress(evt) {
+function editorKeyDown(evt) {
     switch (evt.keyCode) {
         case 13: //ENTER
             sendAsyncAction(ConcludeEdit());
@@ -53,25 +55,29 @@ function deleteTodo(id) {
  * Component that represents a single row in the
  * Todo list
  */
-export default function TodoCmp({todo, idBeingEdited, editName, className}) {
+export default function TodoCmp({todo, idBeingEdited, editName}) {
     const {id, name, completed} = todo,
         editing = id === idBeingEdited,
-        nameEl = editing ?
-            //if editing, show a text box.  The value should be the
-            //current (unsaved) editName
-            <input type="text" value={editName} onChange={updateEditName}
-                onKeyPress={editorKeyPress}/> :
+        editorId = `todo-${id}`,
 
-            //if not editing, show the name as a span.  Note the use
-            //of bind to set up the doubleclick handler
-            <span onDoubleClick={startEdit.bind(null, id)} className="name">{name}</span>;
+        //add the completed class if the todo is completed, and the editing class if the
+        //name is being edited
+        className = classnames({ completed, editing });
 
     return (
         <li className={className}>
-            {nameEl}
-            <Toggle className="completed-toggle" onChange={toggleCompleted.bind(null, id)}
-                checked={completed} />
-            <button className="delete" onClick={deleteTodo.bind(null, id)}>&times;</button>
+            <div className="view">
+                <Toggle className="completed-toggle" onChange={toggleCompleted.bind(null, id)}
+                    checked={completed} />
+
+                <label onDoubleClick={startEdit.bind(null, id)}>{name}</label>
+
+                <button className="destroy" onClick={deleteTodo.bind(null, id)}></button>
+            </div>
+            { editing &&
+                <input className="edit" id={editorId} value={editName} onChange={updateEditName}
+                    onKeyDown={editorKeyDown}/>
+            }
         </li>
     );
 }

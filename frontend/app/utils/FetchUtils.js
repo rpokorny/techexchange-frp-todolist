@@ -15,9 +15,9 @@ function ok(resp) {
 }
 
 /**
- * Perform an HTTP call and return a Kefir stream containing the result
+ * Perform an HTTP call and return a Kefir stream containing the Response or an error
  */
-export function fetchStream(uri, method, body) {
+export function fetchStreamWithoutData(uri, method, body) {
     //use the (upcoming standard) window.fetch API to perform the HTTP call.  This returns
     //a Promise
     const promise = window.fetch(uri, {
@@ -33,11 +33,15 @@ export function fetchStream(uri, method, body) {
     //Note that the .json() method also returns a Promise, so we need to turn that into a
     //stream as well and then flatMap that stream into the main one
     return exceptionsToErrors(Kefir.fromPromise(promise)
-        .flatMap(resp => ok(resp) ?
-            Kefir.fromPromise(resp.json()) :
-            Kefir.constantError(resp)));
+        .flatMap(resp => ok(resp) ? Kefir.constant(resp) : Kefir.constantError(resp)));
 }
 
+/**
+ * Perform an HTTP call and return a Kefir stream containing the parsed JSON result
+ */
+export const fetchStream = (uri, method, body) =>
+    fetchStreamWithoutData(uri, method, body)
+        .flatMap(resp => Kefir.fromPromise(resp.json()))/*.log()*/;
 
 /**
  * convert any Response objects in the error stream into Error objects.

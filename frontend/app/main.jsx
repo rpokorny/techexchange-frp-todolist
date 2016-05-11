@@ -19,6 +19,7 @@ const uiElement = document.getElementById('ui');
 //This is where Kefir and React get connected - when the state Property changes, re-render
 //the React Virtual DOM
 state.onValue(function(model) {
+    console.debug(model.toJS());
     ReactDOM.render(<App model={model} />, uiElement);
 });
 

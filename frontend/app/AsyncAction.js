@@ -1,6 +1,6 @@
 import * as Kefir from 'kefir';
 
-import { handleFetchErrors, fetchStream } from './utils/FetchUtils';
+import { handleFetchErrors, fetchStream, fetchStreamWithoutData } from './utils/FetchUtils';
 import * as Action from './Action';
 
 //this gets injected by webpack
@@ -16,7 +16,7 @@ const apiEntryPoint = API_ENTRY_URI,
  */
 export function LoadTodos() {
 
-    //create a stream which fetches the Todos from the server, emits a Loading action, and emits
+    //create a stream which emits a Loading action, fetches the Todos from the server, and emits
     //a SetTodos action when the server call completes
     return () => Kefir.merge([
         Kefir.constant(Action.Loading()),
@@ -31,10 +31,15 @@ export function LoadTodos() {
 export function AddTodo() {
 
     return function(model) {
-        const { name, completed } = model.addingTodo,
-            messageBody = JSON.stringify({name, completed});
+        const messageBody = JSON.stringify({
+            name: model.addingName,
+            completed: false
+        });
 
-        return handleErrors(fetchStream(apiEntryPoint, 'POST', messageBody).map(Action.AddTodo));
+        return Kefir.merge([
+            Kefir.constant(Action.ClearAddingName()),
+            handleErrors(fetchStream(apiEntryPoint, 'POST', messageBody).map(Action.AddTodo))
+        ]);
     };
 }
 
@@ -43,7 +48,7 @@ export function AddTodo() {
  */
 export function UpdateTodo(todo) {
     const uri = todo.id,
-        messageBody = JSON.stringify(todo),
+        messageBody = JSON.stringify({ name: todo.name, completed: todo.completed }),
 
         //partially apply the UpdateTodoById action constructor to get a function
         //that receives a todo pojo and creates an action that updates the correct
@@ -61,7 +66,8 @@ export function DeleteTodo(id) {
         action = Action.DeleteTodo(uri);
 
     //delete the Todo and then emit the DeleteTodo action upon completion
-    return () => handleErrors(Kefir.constant(action).sampledBy(fetchStream(uri, 'DELETE')));
+    return () => handleErrors(Kefir.constant(action).sampledBy(
+                fetchStreamWithoutData(uri, 'DELETE')));
 }
 
 /**
@@ -69,10 +75,10 @@ export function DeleteTodo(id) {
  */
 export function SetTodoCompleted(id, completed) {
     return function(model) {
-        const todo = model.find(t => t.id === id);
+        const todo = model.todos.find(t => t.id === id);
 
         if (todo) {
-            return Action.UpdateTodo(todo.set('completed', completed));
+            return UpdateTodo(todo.set('completed', completed))(model);
         }
         else {
             return Kefir.constant(Action.SetErrorMessage(`Id ${id} not found`));
@@ -86,12 +92,12 @@ export function SetTodoCompleted(id, completed) {
 export function ConcludeEdit() {
     return function(model) {
         const id = model.editing,
-            todo = model.find(t => t.id === id);
+            todo = model.todos.find(t => t.id === id);
 
         if (todo) {
             return Kefir.merge([
-                UpdateTodo(todo.set('name', model.editName)),
-                Kefir.constant(Action.ConcludeEdit)
+                UpdateTodo(todo.set('name', model.editName))(model),
+                Kefir.constant(Action.ConcludeEdit())
             ]);
         }
         else {
