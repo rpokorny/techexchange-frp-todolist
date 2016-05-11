@@ -1,6 +1,6 @@
 {
   "name": "techexchange-todofrp",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Demonstration app of an FRP architecture using Immutable.js, Kefir.js, and React.js",
   "main": "index.js",
   "repository": "https://github.com/rpokorny/techexchange-frp-todolist.git",
