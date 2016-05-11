@@ -7,7 +7,6 @@ import * as Immutable from 'immutable';
  * the properties and default values specified here
  */
 export default Immutable.Record({
-    loading: false,
     errorMessage: null,         //null if no error, string message if error
     editing: null,              //null if not editing, id of listing to edit if editing
     editName: null,             //when editing, the unsaved value of the edit box

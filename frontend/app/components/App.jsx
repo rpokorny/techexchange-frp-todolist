@@ -1,5 +1,4 @@
 import React from 'react';
-import classnames from 'classnames';
 
 import Model from '../model/Model';
 
@@ -37,18 +36,13 @@ function handleAddNewKeydown(evt) {
  * Note that the component's props objects is destructured in the parameter list
  */
 export default function App({model}) {
-    const {loading, todos, errorMessage, addingName, editName, editing} = model,
+    const {todos, errorMessage, addingName, editName, editing} = model,
 
         //function to create a <Todo> component for a Todo model.  Whenever creating a list
         //of components, the `key` prop is required so react can efficiently keep track of
         //which is which in case of reordering or deletion
         mkTodo = todo =>
             <Todo key={todo.id} todo={todo} idBeingEdited={editing} editName={editName} />,
-
-        //use the classnames utility to easily create a string value for the html class attr.
-        //In this case we want the <main> element to have a 'loading'
-        //class iff the loading property is true.
-        mainClasses = classnames({ loading }),
 
         //create a list of <Todo> components from the todos.  One of the great things about
         //react is that this type of logic is done in plain old js instead of some half-baked
@@ -66,23 +60,22 @@ export default function App({model}) {
     //Note that in jsx, you use className instead of class, since class is a reserved
     //word in javascript
     return (
-        <section id="todoapp" className={mainClasses}>
+        <section id="todoapp">
             <header id="header">
                 <h1>FRP Todo List</h1>
                 <input type="text" id="new-todo" placeholder="What needs to be done?"
                     autofocus value={addingName}
                     onChange={updateAddingName} onKeyDown={handleAddNewKeydown} />
             </header>
-            <div className="loading-spinner"/>
-            <section id="main">
-                { /* Only include this next <section> if there is an errorMessage */ }
-                { errorMessage &&
-                    <section className="error-message">
-                        {errorMessage}
-                        <button className="close" onClick={dismissError}></button>
-                    </section>
-                }
+            { /* Only include this next <section> if there is an errorMessage */ }
+            { errorMessage &&
+                <section className="error-message">
+                    {errorMessage}
+                    <button className="close" onClick={dismissError}></button>
+                </section>
+            }
 
+            <section id="main">
                 <ul id="todo-list">
                     {todoEls}
                 </ul>

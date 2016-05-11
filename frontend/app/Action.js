@@ -11,20 +11,12 @@ import Todo from './model/Todo';
 //many actions here unset the error message.  This function abstracts that
 const noError = model => model.set('errorMessage', null);
 
-//This function simply turns on the loading spinner and removes any error message
-export function Loading() {
-    return model => noError(model.set('loading', true));
-}
-
 //this function sets the error message based on the parameter.
 //`error` can either be a string or an Error object.
 export function SetErrorMessage(error) {
     const message = error instanceof Error ? error.message : error;
 
-    return model => model.merge({
-        loading: false,
-        errorMessage: message
-    });
+    return model => model.set('errorMessage', message);
 }
 
 /**

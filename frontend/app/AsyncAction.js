@@ -16,12 +16,9 @@ const apiEntryPoint = API_ENTRY_URI,
  */
 export function LoadTodos() {
 
-    //create a stream which emits a Loading action, fetches the Todos from the server, and emits
+    //create a stream which fetches the Todos from the server, and emits
     //a SetTodos action when the server call completes
-    return () => Kefir.merge([
-        Kefir.constant(Action.Loading()),
-        handleErrors(fetchStream(apiEntryPoint).map(Action.SetTodos))
-    ]);
+    return () => handleErrors(fetchStream(apiEntryPoint).map(Action.SetTodos));
 }
 
 /**
