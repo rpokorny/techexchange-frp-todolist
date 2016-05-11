@@ -7,15 +7,11 @@ import Todo from './Todo';
 
 import ActionPool from '../frp/ActionPool';
 import AsyncActionPool from '../frp/AsyncActionPool';
-import { DismissError, SetAddingName } from '../Action';
+import { SetAddingName } from '../Action';
 import { AddTodo } from '../AsyncAction';
 
-//handler for the error message close button - like all handlers in this architecture, it
+//handler for changes to the new Todo text box - like all handlers in this architecture, it
 //essentially converts the user input into an Action that further drives the state
-function dismissError() {
-    ActionPool.sendAction(DismissError());
-}
-
 function updateAddingName(evt) {
     ActionPool.sendAction(SetAddingName(evt.target.value));
 }
@@ -71,7 +67,6 @@ export default function App({model}) {
             { errorMessage &&
                 <section className="error-message">
                     {errorMessage}
-                    <button className="close" onClick={dismissError}></button>
                 </section>
             }
 

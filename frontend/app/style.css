@@ -558,3 +558,12 @@ hr {
         margin: 130px auto 40px auto;
     }
 }
+
+.error-message {
+    background-color: #D5241A;
+    padding: 5px;
+    padding-left: 50px;
+
+    color: white;
+
+}
