@@ -6,7 +6,7 @@ const gulp = require('gulp'),
     webpackConfig = require("../webpack.config.js"),
     WebpackDevServer = require('webpack-dev-server');
 
-gulp.task('webpack-dev', ['html'], function () {
+gulp.task('webpack-dev', ['copy'], function () {
     const devConfig = Object.assign({}, webpackConfig, {
             debug: true
         }),
