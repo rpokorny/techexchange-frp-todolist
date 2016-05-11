@@ -5,6 +5,11 @@
     <filter>
         <filter-name>CorsFilter</filter-name>
         <filter-class>org.ebaysf.web.cors.CORSFilter</filter-class>
+        <init-param>
+            <description>A comma separated list of HTTP verbs, using which a CORS request can be made.</description>
+            <param-name>cors.allowed.methods</param-name>
+            <param-value>GET,POST,HEAD,OPTIONS,PUT,DELETE</param-value>
+        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>CorsFilter</filter-name>
