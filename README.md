@@ -11,3 +11,6 @@ mvn must be installed on your system.
 To start the frontend, go into the `frontend` directory and run `npm start`.
 npm and node must be installed on your system.  Before running the frontend, you
 must run `npm install` in order to download dependencies.
+
+Once everything is running, visit http://localhost:8000/target/dist/index.html
+in your browser.
